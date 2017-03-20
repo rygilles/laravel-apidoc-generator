@@ -1,0 +1,20 @@
+{
+    "name": "rygilles/laravel-apidoc-generator",
+    "description": "Laravel API documentation generator, based on mpociot lib",
+    "type": "library",
+    "require": {
+        "mpociot/laravel-apidoc-generator": "2.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ryan Gilles",
+            "email": "ryan@e-monsite.com"
+        }
+    ],
+	"autoload": {
+		"psr-0": {
+			"Rygilles\\ApiDoc": "src/"
+		}
+	}
+}
