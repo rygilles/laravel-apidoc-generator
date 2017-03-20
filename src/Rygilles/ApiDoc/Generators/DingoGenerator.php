@@ -65,7 +65,7 @@ class DingoGenerator extends \Mpociot\ApiDoc\Generators\DingoGenerator
 			$this->getParentCommand()->comment('Response :' . "\r\n" . print_r(json_decode($resp->getContent()), true));
 		} catch (\Exception $e) {
 			// Rygilles : WIP debug log
-			$this->getParentCommand()->error('Call failed : ' . get_class($e) . ' : '  . $e->getMessage() . "\r\n" . $e->getFile() . ' at line ' . $e->getLine());
+			$this->getParentCommand()->warn('Call failed, ignore response : ' . get_class($e) . ' : '  . $e->getMessage() . "\r\n" . 'file ' . $e->getFile() . ' at line ' . $e->getLine());
 		}
 
 		return $resp;
