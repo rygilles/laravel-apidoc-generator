@@ -1,6 +1,6 @@
 {
     "name": "rygilles/laravel-apidoc-generator",
-    "description": "Laravel API documentation generator, based on mpociot lib",
+    "description": "Laravel API documentation generator, based on mpociot lib with Passport integration and user UUID",
     "type": "library",
     "require": {
         "mpociot/laravel-apidoc-generator": "2.0"

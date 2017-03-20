@@ -58,11 +58,11 @@ class DingoGenerator extends \Mpociot\ApiDoc\Generators\DingoGenerator
 		});
 
 		// Rygilles : Extra console output logs
-		$this->getParentCommand()->info('Calling route [method="' . $method . '", "uri=' . ltrim($uri, '/') . '", parameters=["' . implode('", "', $parameters) . '"]' /* with headers : ' . "\r\n" . print_r($server, true)*/ . "\r\n");
+		$this->getParentCommand()->comment('Calling route [method="' . $method . '", "uri=' . ltrim($uri, '/') . '", parameters=["' . implode('", "', $parameters) . '"]' /* with headers : ' . "\r\n" . print_r($server, true)*/ . "\r\n");
 
 		try {
 			$resp = call_user_func_array([$dispatcher, strtolower($method)], [$uri]);
-			$this->getParentCommand()->info('Response :' . "\r\n" . print_r(json_decode($resp->getContent()), true));
+			$this->getParentCommand()->comment('Response :' . "\r\n" . print_r(json_decode($resp->getContent()), true));
 		} catch (\Exception $e) {
 			// Rygilles : WIP debug log
 			//dd(get_class($e) . ' : '  . $e->getMessage() . "\r\n" . $e->getFile() . ' at line ' . $e->getLine());
