@@ -8,6 +8,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Mpociot\ApiDoc\Parsers\RuleDescriptionParser as Description;
+use Mpociot\Reflection\DocBlock;
+use ReflectionClass;
 
 class DingoGenerator extends \Mpociot\ApiDoc\Generators\DingoGenerator
 {
@@ -50,11 +52,17 @@ class DingoGenerator extends \Mpociot\ApiDoc\Generators\DingoGenerator
 	{
 		$response = '';
 
-		if ($withResponse) {
+		$routeAction = $route->getAction();
+		$routeApiDocsSettings = $this->getRouteApiDocsSettings($routeAction['uses']);
+		if ($withResponse && !in_array('no_call', $routeApiDocsSettings)) {
 			try {
 				$response = $this->getRouteResponse($route, $bindings, $headers);
 			} catch (Exception $e) {
 			}
+		}
+
+		if (in_array('no_call', $routeApiDocsSettings)) {
+			$this->getParentCommand()->info('Ignore route call for ' . $routeAction['uses']);
 		}
 
 		// Rygilles : Fix for model tranformers
@@ -62,8 +70,6 @@ class DingoGenerator extends \Mpociot\ApiDoc\Generators\DingoGenerator
 		if (is_object($response)) {
 			$response = $response->content();
 		}
-
-		$routeAction = $route->getAction();
 		$routeGroup = $this->getRouteGroup($routeAction['uses']);
 		$routeDescription = $this->getRouteDescription($routeAction['uses']);
 
@@ -85,7 +91,7 @@ class DingoGenerator extends \Mpociot\ApiDoc\Generators\DingoGenerator
 	}
 
 	/**
-	 * Rygilles : Try to add model description dor this route (using resource name / route group)
+	 * Rygilles : Try to add model description for this route (using resource name / route group)
 	 *
 	 * @param \Illuminate\Routing\Route $route
 	 * @return string
@@ -138,6 +144,48 @@ class DingoGenerator extends \Mpociot\ApiDoc\Generators\DingoGenerator
 
 		return $description;
 	}
+
+	/**
+	 * Rygilles : Return route settings for documentation generation
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return string[]
+	 */
+	protected function getRouteApiDocsSettings($route)
+	{
+		list($class, $method) = explode('@', $route);
+		$reflection = new ReflectionClass($class);
+		$reflectionMethod = $reflection->getMethod($method);
+
+		$comment = $reflectionMethod->getDocComment();
+		$phpdoc = new DocBlock($comment);
+
+		$settings = [];
+
+		/*
+		if ($phpdoc->hasTag('ApiDocsProfiles')) {
+			$apiDocsProfilesTag = array_first($phpdoc->getTagsByName('ApiDocsProfiles'));
+			try {
+				$apiDocsProfiles = json_decode($apiDocsProfilesTag->getContent());
+				if (is_null($apiDocsProfiles)) {
+					$this->getParentCommand->warn('@ApiDocsProfile found on route ' . $route . ' but is not JSON formatted');
+					return [];
+				}
+
+			} catch (\Exception $e) {
+				$this->getParentCommand->warn('@ApiDocsProfile found on route ' . $route . ' but is not JSON formatted');
+				return [];
+			}
+		}
+		*/
+
+		// Document the route but don't make a call (prevent DELETE...)
+		if ($phpdoc->hasTag('ApiDocsNoCall')) {
+			$settings[] = 'no_call';
+		}
+
+		return $settings;
+    }
 
 	/**
 	 * @param array $routeData
