@@ -1,6 +1,6 @@
 # laravel-apidoc-generator
 
-Laravel API documentation generator, based on mpociot.
+Laravel API documentation generator, based on mpociot's lib : [https://github.com/mpociot/laravel-apidoc-generator](https://github.com/mpociot/laravel-apidoc-generator).
 
 *(**Work in progress**... personal features on test).*
 
