@@ -18,6 +18,7 @@ Laravel API documentation generator, based on mpociot's lib : [https://github.co
     - Passport guard "api" user support (When using `actAsUserId`).
     - `uuid` rule support for fake values.
     - `strength` (password) rule support for fake values.
+    - `md5` rule support for fake values.
 
 ## PhpDoc
 

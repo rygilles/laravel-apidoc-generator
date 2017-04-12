@@ -280,6 +280,11 @@ class DingoGenerator extends \Mpociot\ApiDoc\Generators\DingoGenerator
 				$attributeData['description'][] = Description::parse($rule)->getDescription();
 				$attributeData['value'] = $faker->uuid;
 				break;
+			// Rygilles : md5 fake value
+			case 'md5':
+				$attributeData['description'][] = Description::parse($rule)->getDescription();
+				$attributeData['value'] = $faker->md5;
+				break;
 			// Rygilles : strength fake value (password)
 			case 'strength':
 				$attributeData['description'][] = Description::parse($rule)->getDescription();
