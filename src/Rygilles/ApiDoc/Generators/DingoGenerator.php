@@ -91,6 +91,63 @@ class DingoGenerator extends \Mpociot\ApiDoc\Generators\DingoGenerator
 	}
 
 	/**
+	 * Rygilles : Add extra bindings from GET parameters defined in request validation rules (only required and defined ones)
+	 *
+	 * @param $route
+	 * @param array $bindings
+	 *
+	 * @return mixed
+	 */
+	protected function addRouteModelBindings($route, $bindings)
+	{
+		$uri = $this->getUri($route);
+		foreach ($bindings as $model => $id) {
+			$uri = str_replace('{'.$model.'}', $id, $uri);
+		}
+
+		$routeAction = $route->getAction();
+		$routeMethods = $route->getMethods();
+
+		if (in_array('GET', $routeMethods)) {
+			$extraGetParameters = [];
+
+			$validator = \Illuminate\Support\Facades\Validator::make([], $this->getRouteRules($routeAction['uses'], $bindings));
+			foreach ($validator->getRules() as $attribute => $rules) {
+				/*
+				$attributeData = [
+					'required' => false,
+					'type' => null,
+					'default' => '',
+					'value' => '',
+					'description' => [],
+				];
+				foreach ($rules as $ruleName => $rule) {
+					// Rygilles : We only need the required attribute, seed = 0
+					$this->parseRule($rule, $attribute, $attributeData, 0);
+				}
+				*/
+				if (isset($bindings[$attribute])) {
+					$extraGetParameters[$attribute] = $bindings[$attribute];
+				}
+			}
+
+			if (count($extraGetParameters) > 0) {
+				$attribute_key = array_keys($extraGetParameters)[0];
+				$attribute_value = $extraGetParameters[$attribute_key];
+				$uri .= '?' . $attribute_key . '=' . $attribute_value;
+
+				unset($extraGetParameters[$attribute_key]);
+
+				foreach ($extraGetParameters as $attribute_key => $attribute_value) {
+					$uri .= '&' . $attribute_key . '=' . $attribute_value;
+				}
+			}
+		}
+
+		return $uri;
+	}
+
+	/**
 	 * Rygilles : Try to add model description for this route (using resource name / route group)
 	 *
 	 * @param \Illuminate\Routing\Route $route
@@ -244,7 +301,7 @@ class DingoGenerator extends \Mpociot\ApiDoc\Generators\DingoGenerator
 		});
 
 		// Rygilles : Extra console output logs
-		//$this->getParentCommand()->comment("\r\n" . 'Calling route (method="' . $method . '", "uri=' . ltrim($uri, '/') . '", parameters=["' . implode('", "', $parameters) . '"])' /* with headers : ' . "\r\n" . print_r($server, true) . "\r\n"*/);
+		$this->getParentCommand()->comment("\r\n" . 'Calling route (method="' . $method . '", "uri=' . ltrim($uri, '/') . '", parameters=["' . implode('", "', $parameters) . '"])' /* with headers : ' . "\r\n" . print_r($server, true) . "\r\n"*/);
 
 		try {
 			$resp = call_user_func_array([$dispatcher, strtolower($method)], [$uri]);
