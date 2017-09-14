@@ -264,7 +264,7 @@ class DingoGenerator extends \Mpociot\ApiDoc\Generators\DingoGenerator
 			];
 			foreach ($rules as $ruleName => $rule) {
 				// Rygilles : add rand to seed
-				$this->parseRule($rule, $attribute, $attributeData, $routeData['id'] + rand(0, 1000));
+				$this->parseRule($rule, $attribute, $attributeData, (int)$routeData['id'] + (int)rand(0, 1000));
 			}
 			$routeData['parameters'][$attribute] = $attributeData;
 		}
